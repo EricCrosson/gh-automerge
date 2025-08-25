@@ -3,78 +3,32 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
-    git-hooks = {
-      url = "github:cachix/git-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = {
+    # deadnix: skip
     self,
-    git-hooks,
     nixpkgs,
   }: let
-    # System types to support.
-    supportedSystems = ["x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin"];
-
-    # Helper function to generate an attrset '{ x86_64-linux = f "x86_64-linux"; ... }'.
-    forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-
-    # Nixpkgs instantiated for supported system types.
-    nixpkgsFor = forAllSystems (system: import nixpkgs {inherit system;});
+    forEachSystem = nixpkgs.lib.genAttrs [
+      "aarch64-darwin"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "x86_64-linux"
+    ];
   in {
-    checks = forAllSystems (system: let
-      pre-commit-check = git-hooks.lib.${system}.run {
+    packages = forEachSystem (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+      cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
+      gh-arm = pkgs.rustPlatform.buildRustPackage {
+        inherit (cargoToml.package) version;
+        pname = cargoToml.package.name;
         src = ./.;
-        hooks = {
-          actionlint.enable = true;
-          alejandra = {
-            enable = true;
-            settings = {
-              verbosity = "quiet";
-            };
-          };
-          cargo-check.enable = true;
-          clippy.enable = true;
-          deadnix.enable = true;
-          prettier.enable = true;
-          rustfmt.enable = true;
-          shellcheck.enable = true;
-          shfmt.enable = true;
-          statix.enable = true;
+        cargoLock = {
+          lockFile = ./Cargo.lock;
+          outputHashes = {};
         };
       };
-    in {
-      inherit pre-commit-check;
-    });
-
-    # Add dependencies that are only needed for development
-    devShells = forAllSystems (system: let
-      pkgs = nixpkgsFor.${system};
-    in {
-      default = pkgs.mkShell {
-        inherit (self.checks.${system}.pre-commit-check) shellHook;
-        buildInputs = with pkgs; [
-          rustc
-          cargo
-        ];
-      };
-    });
-
-    packages = forAllSystems (system: let
-      pkgs = nixpkgsFor.${system};
-      gh-arm = let
-        cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
-      in
-        pkgs.rustPlatform.buildRustPackage {
-          inherit (cargoToml.package) version;
-          pname = cargoToml.package.name;
-          src = ./.;
-          cargoLock = {
-            lockFile = ./Cargo.lock;
-            outputHashes = {};
-          };
-        };
     in {
       inherit gh-arm;
       default = gh-arm;
