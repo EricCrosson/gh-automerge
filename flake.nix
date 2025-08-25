@@ -1,5 +1,5 @@
 {
-  description = "GitHub CLI extension to mark a PR as ready for review and enable auto-merge";
+  description = "GitHub CLI extension to enable auto-merge on a PR";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
@@ -20,7 +20,7 @@
     packages = forEachSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
-      gh-arm = pkgs.rustPlatform.buildRustPackage {
+      gh-automerge = pkgs.rustPlatform.buildRustPackage {
         inherit (cargoToml.package) version;
         pname = cargoToml.package.name;
         src = ./.;
@@ -30,8 +30,8 @@
         };
       };
     in {
-      inherit gh-arm;
-      default = gh-arm;
+      inherit gh-automerge;
+      default = gh-automerge;
     });
   };
 }

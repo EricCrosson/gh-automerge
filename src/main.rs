@@ -3,11 +3,11 @@ use std::process::{Command, exit};
 
 fn print_usage() {
     println!("\nUsage:");
-    println!("  gh arm [<number> | <url> | <branch>]");
+    println!("  gh automerge [<number> | <url> | <branch>]");
     println!("\nOptions:");
-    println!("  <number>    PR number to merge");
-    println!("  <url>       PR URL to merge");
-    println!("  <branch>    Branch name to merge");
+    println!("  <number>    PR number to enable auto-merge on");
+    println!("  <url>       PR URL to enable auto-merge on");
+    println!("  <branch>    Branch name to enable auto-merge on");
     println!("              If no argument is provided, the current branch is used");
 }
 
@@ -22,7 +22,7 @@ fn main() {
         }
     }
 
-    // Create base commands
+    // Create command to enable auto-merge
     let mut merge_command = Command::new("gh");
     merge_command
         .arg("pr")
@@ -30,17 +30,13 @@ fn main() {
         .arg("--auto")
         .arg("--merge");
 
-    let mut ready_command = Command::new("gh");
-    ready_command.arg("pr").arg("ready");
-
     // Add PR identifier if provided
     if args.len() > 1 {
         let pr_identifier = &args[1];
         merge_command.arg(pr_identifier);
-        ready_command.arg(pr_identifier);
     }
 
-    // Execute gh pr merge command
+    // Execute gh pr merge --auto --merge command
     let merge_status = merge_command
         .stdout(std::process::Stdio::inherit())
         .stderr(std::process::Stdio::inherit())
@@ -49,26 +45,7 @@ fn main() {
     // Check if the command was successful
     match merge_status {
         Err(e) => {
-            eprintln!("Failed to execute merge command: {}", e);
-            exit(1);
-        }
-        Ok(status) if !status.success() => {
-            // Exit with the same code that the command returned
-            exit(status.code().unwrap_or(1));
-        }
-        _ => {}
-    }
-
-    // Execute gh pr ready command
-    let ready_status = ready_command
-        .stdout(std::process::Stdio::inherit())
-        .stderr(std::process::Stdio::inherit())
-        .status();
-
-    // Check if the command was successful
-    match ready_status {
-        Err(e) => {
-            eprintln!("Failed to execute ready command: {}", e);
+            eprintln!("Failed to enable auto-merge: {}", e);
             exit(1);
         }
         Ok(status) if !status.success() => {

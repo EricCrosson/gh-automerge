@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "gh-arm"
+name = "gh-automerge"
 version = "0.0.0-semantic-release-managed"

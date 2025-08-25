@@ -48,7 +48,7 @@ fi
 OUTPUT_FILE="dist/${GOOS}-${GOARCH}${EXTENSION}"
 
 # Copy the built binary to the output location
-cp target/release/gh-arm "$OUTPUT_FILE"
+cp target/release/gh-automerge "$OUTPUT_FILE"
 chmod +x "$OUTPUT_FILE"
 
-echo "Successfully built gh-arm extension at $OUTPUT_FILE"
+echo "Successfully built gh-automerge extension at $OUTPUT_FILE"

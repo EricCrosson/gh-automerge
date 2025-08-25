@@ -1,6 +1,6 @@
-# gh-arm
+# gh-automerge
 
-**gh-arm** is a GitHub CLI extension to mark a pull request as ready for review and enable auto-merge.
+**gh-automerge** is a GitHub CLI extension to enable auto-merge on a pull request.
 
 ## Prerequisites
 
@@ -9,13 +9,13 @@
 ## Install
 
 ```bash
-gh extension install EricCrosson/gh-arm
+gh extension install EricCrosson/gh-automerge
 ```
 
 ## Use
 
 ```bash
-gh arm [<number> | <url> | <branch>]
+gh automerge [<number> | <url> | <branch>]
 ```
 
 ## License

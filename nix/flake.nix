@@ -1,5 +1,5 @@
 {
-  description = "GitHub CLI extension to mark a PR as ready for review and enable auto-merge";
+  description = "GitHub CLI extension to enable auto-merge on a PR";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
