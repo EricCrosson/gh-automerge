@@ -1,35 +1,34 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Hello gh-arm!"
+usage() {
+	cat <<EOF
 
-# Snippets to help get started:
+Usage:
+  gh arm <number>
 
-# Determine if an executable is in the PATH
-# if ! type -p ruby >/dev/null; then
-#   echo "Ruby not found on the system" >&2
-#   exit 1
-# fi
+Options:
+  <number>    PR number to merge
+EOF
+}
 
-# Pass arguments through to another command
-# gh issue list "$@" -R cli/cli
+pull_request_number=""
 
-# Using the gh api command to retrieve and format information
-# QUERY='
-#   query($endCursor: String) {
-#     viewer {
-#       repositories(first: 100, after: $endCursor) {
-#         nodes {
-#           nameWithOwner
-#           stargazerCount
-#         }
-#       }
-#     }
-#   }
-# '
-# TEMPLATE='
-#   {{- range $repo := .data.viewer.repositories.nodes -}}
-#     {{- printf "name: %s - stargazers: %v\n" $repo.nameWithOwner $repo.stargazerCount -}}
-#   {{- end -}}
-# '
-# exec gh api graphql -f query="${QUERY}" --paginate --template="${TEMPLATE}"
+# Parse arguments
+while [ "${1:-}" != "" ]; do
+	case "$1" in
+	# Matches every non-integer argument, including -h and --help
+	*[!0-9]*)
+		usage
+		exit 1
+		;;
+	# A valid integer argument
+	*)
+		pull_request_number=$1
+		shift # past value
+		;;
+	esac
+done
+
+gh pr merge --auto --merge "$pull_request_number"
+gh pr ready "$pull_request_number"
