@@ -3,25 +3,14 @@ use std::process::{Command, exit};
 
 fn print_usage() {
     println!("\nUsage:");
-    println!("  gh automerge [<number> | <url> | <branch>]");
+    println!("  gh automerge [<number> | <url> | <branch>]...");
     println!("\nOptions:");
     println!("  <number>    PR number to enable auto-merge on");
     println!("  <url>       PR URL to enable auto-merge on");
     println!("  <branch>    Branch name to enable auto-merge on");
-    println!("              If no argument is provided, the current branch is used");
 }
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    // Check for help flag anywhere in the arguments
-    for arg in &args[1..] {
-        if arg == "-h" || arg == "--help" {
-            print_usage();
-            exit(0);
-        }
-    }
-
+fn process_pull_request(pull_request_identifier: Option<&str>) {
     // Create command to enable auto-merge
     let mut merge_command = Command::new("gh");
     merge_command
@@ -31,8 +20,7 @@ fn main() {
         .arg("--merge");
 
     // Add PR identifier if provided
-    if args.len() > 1 {
-        let pr_identifier = &args[1];
+    if let Some(pr_identifier) = pull_request_identifier {
         merge_command.arg(pr_identifier);
     }
 
@@ -53,5 +41,28 @@ fn main() {
             exit(status.code().unwrap_or(1));
         }
         _ => {}
+    }
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    // Check for help flag anywhere in the arguments
+    for arg in &args[1..] {
+        if arg == "-h" || arg == "--help" {
+            print_usage();
+            exit(0);
+        }
+    }
+
+    // Process with no arguments (current branch)
+    if args.len() == 1 {
+        process_pull_request(None);
+        return;
+    }
+
+    // Process each argument sequentially
+    for pull_request_identifier in args.iter().skip(1) {
+        process_pull_request(Some(pull_request_identifier));
     }
 }

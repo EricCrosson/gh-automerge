@@ -15,7 +15,13 @@ gh extension install EricCrosson/gh-automerge
 ## Use
 
 ```bash
-gh automerge [<number> | <url> | <branch>]
+gh automerge [<number> | <url> | <branch>]...
+```
+
+You can provide multiple pull requests to process them sequentially:
+
+```bash
+gh automerge 123 456
 ```
 
 ## License
