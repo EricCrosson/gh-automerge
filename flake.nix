@@ -34,8 +34,11 @@
               verbosity = "quiet";
             };
           };
+          cargo-check.enable = true;
+          clippy.enable = true;
           deadnix.enable = true;
           prettier.enable = true;
+          rustfmt.enable = true;
           shellcheck.enable = true;
           shfmt.enable = true;
           statix.enable = true;
@@ -51,15 +54,27 @@
     in {
       default = pkgs.mkShell {
         inherit (self.checks.${system}.pre-commit-check) shellHook;
+        buildInputs = with pkgs; [
+          rustc
+          cargo
+        ];
       };
     });
 
     packages = forAllSystems (system: let
       pkgs = nixpkgsFor.${system};
-      gh-arm = pkgs.writeShellApplication {
-        name = "gh-arm";
-        text = builtins.readFile ./gh-arm;
-      };
+      gh-arm = let
+        cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
+      in
+        pkgs.rustPlatform.buildRustPackage {
+          inherit (cargoToml.package) version;
+          pname = cargoToml.package.name;
+          src = ./.;
+          cargoLock = {
+            lockFile = ./Cargo.lock;
+            outputHashes = {};
+          };
+        };
     in {
       inherit gh-arm;
       default = gh-arm;

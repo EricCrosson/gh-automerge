@@ -1,0 +1,23 @@
+[package]
+name = "gh-arm"
+version = "0.0.0-semantic-release-managed"
+edition = "2024"
+authors = ["Eric Crosson <eric.s.crosson@utexas.edu>"]
+license = "MIT OR Apache-2.0"
+description = "GitHub CLI extension to mark a PR as ready for review and enable auto-merge"
+readme = "README.md"
+repository = "https://github.com/EricCrosson/gh-arm"
+keywords = ["cli", "git", "gh", "pull-request"]
+categories = ["command-line-utilities"]
+exclude = [
+  "/.envrc",
+  "/.github",
+  "/.gitignore",
+  "/CHANGELOG.md",
+  "/flake.{lock,nix}"
+]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
