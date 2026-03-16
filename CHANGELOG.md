@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/EricCrosson/gh-automerge/compare/v1.0.0...v1.0.1) (2026-03-16)
+
+
+### Bug Fixes
+
+* **ci:** explicitly push binary to cachix after nix build ([f8846da](https://github.com/EricCrosson/gh-automerge/commit/f8846daa51cc8784cc33080aee10da6c3863ec72))
+
 # 1.0.0 (2025-08-25)
 
 
