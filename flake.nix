@@ -1,6 +1,9 @@
 {
   description = "GitHub CLI extension to enable auto-merge on a PR";
 
+  nixConfig.extra-substituters = ["https://ericcrosson-gh-automerge.cachix.org"];
+  nixConfig.extra-trusted-public-keys = ["ericcrosson-gh-automerge.cachix.org-1:GbweXYwKQnDBSkYtrGQQ9qYfsjh2Ar9CYUoa78pvqRM="];
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
   };
